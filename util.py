@@ -39,20 +39,26 @@ def print_instruction():
 
 
 def current_board(ongoing_game):
-    market(ongoing_game)
+    ongoing_game = [' '] * 9 
+    instructions = [1,2,3,4,5,6,7,8,9]
+    possible_moves = 9
 
-    return "\t| %s | %s | %s |\t\n-------------\n| %s | %s | %s |\t\n-------------\n| %s | %s | %s |" % (1, 2, 3, 4, 5, 6, 7, 8, 9)
+    board = "\t| %s | %s | %s |\t\n-------------\n| %s | %s | %s |\t\n-------------\n| %s | %s | %s |" % instructions
+    return board
 
 
-def marker(ongoing_game):
-    player1 = ongoing_game[1::2]
-    player2 = ongoing_game[::2]
-
-    if play in player1:
-        return "x"
-
-    if play in player2:
-        return "o"
+def check_win(board=None):
+    winning_combos = (
+        [6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6],
+    )
+    board = [' '] * 9
+    form = "\t| %s | %s | %s |\t\n-------------\n| %s | %s | %s |\t\n-------------\n| %s | %s | %s |"
+    if board is None:
+        return form % tuple(board[6:9] + board[3:6] + board[0:3])
+    else:
+            # when the game starts, display numbers on all the grids
+        return form % tuple(board[6:9] + board[3:6] + board[0:3])
 
 
 def who_move():

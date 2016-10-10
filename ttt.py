@@ -8,6 +8,7 @@ import os
 app = Flask(__name__)
 from werkzeug.serving import run_simple
 slacker = Slacker(secret.SECRET_KEY)
+game = game.Game()
 
 response = slacker.users.list()
 r = response.body['members']
@@ -36,7 +37,7 @@ def main():
             ongoing_game = channel['ongoing_game']
             res = {
                 "response_type": "in_channel",
-                "text": util.current_board(ongoing_game)
+                "text": util.check_win()
             }
 
     if 'challenge' in text:
@@ -49,6 +50,7 @@ def main():
                 "response_type": "ephemeral",
                 "text": "That user is not in this channel",
             }
+
         if user_name in player2:
             res = {
                 "response_type": "ephemeral",
@@ -110,7 +112,7 @@ def main():
 
             "attachments": [
                 {
-                    "text": util.print_instruction(),
+                    "text": game.instructions(),
                     "pretext": "Please use the following cell numbers to make your move",
                     "mrkdwn_in": ["text", "pretext"]
                 }
