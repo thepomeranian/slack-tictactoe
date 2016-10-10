@@ -33,13 +33,17 @@ def main():
             }
 
         else:
-            print "passing"
+            ongoing_game = channel['ongoing_game']
+            res = {
+                "response_type": "in_channel",
+                "text": util.current_board(ongoing_game)
+            }
 
     if 'challenge' in text:
         user_id = request.form.get('user_id')
         user_name = str(request.form.get('user_name'))
         player2 = str(text[11:])
-        players = channel['players']
+
         if player2 not in existing_users:
             res = {
                 "response_type": "ephemeral",
@@ -54,11 +58,14 @@ def main():
         if user_name and player2 in existing_users:
             channel['player1'] = user_name
             channel['player2'] = player2
-            players.add(user_id)
+            players = channel['players']
+            players |= {user_id}
+
             res = {
                 "response_type": "in_channel",
                 "text": "Challenging %s to a match, to accept this match type 'accept'" % player2,
             }
+
         else:
             res = {
                 "response_type": "ephemeral",
@@ -70,17 +77,19 @@ def main():
         user_name = str(request.form.get('user_name'))
         players = channel['players']
         player2 = channel['player2']
+
         if user_name == player2:
-          players.add(user_id)
-          res = {
-              "response_type": "in_channel",
-              "text": "Challenge accepted",
-          }
+            players |= {user_id}
+            res = {
+                "response_type": "in_channel",
+                "text": "Challenge accepted",
+            }
+
         else:
-          res = {
-              "response_type": "ephemeral",
-              "text": "You were not the challenge player.",
-          }
+            res = {
+                "response_type": "ephemeral",
+                "text": "You were not the challenge player.",
+            }
 
     if text == "help":
         res = {
@@ -103,7 +112,7 @@ def main():
                 {
                     "text": util.print_instruction(),
                     "pretext": "Please use the following cell numbers to make your move",
-                    "mrkdwn_in": ["text"]
+                    "mrkdwn_in": ["text", "pretext"]
                 }
             ]
         }
