@@ -12,7 +12,10 @@ class Game:
         self.corners = [0, 2, 6, 8]
         self.sides = [1, 3, 5, 7]
         self.middle = 4
-        self.game_board = '\t| %s | %s | %s |\t\n-------------\n| %s | %s | %s |\t\n-------------\n| %s | %s | %s |'
+        self.game_board = '| %s | %s | %s |\t\n-------------\n| %s | %s | %s |\t\n-------------\n| %s | %s | %s |'
 
     def instructions(self):
       return self.game_board % (1,2,3,4,5,6,7,8,9)
+
+    def print_board(self):
+      return self.game_board % tuple(self.board[6:9] + self.board[3:6] + self.board[0:3])

@@ -23,22 +23,50 @@ def main():
     print util.game_finder(channel_id)
     channel = util.channels[channel_id]
     print channel['players']
+    possible_moves = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
     if text == "game":
         players = channel['players']
 
         if len(players) < 2:
+          res = {
+            "response_type": "ephemeral",
+            "text": "To start a game type 'challenge @username'"
+          }
+
+        if len(players) < 2 and channel['accepted_invite'] == False:
             res = {
                 "response_type": "ephemeral",
-                "text": "To start a game type 'challenge @username'"
+                "text": "Waiting for %s to accept a game. To cancel invite type 'end'" % channel['player2']
             }
 
         else:
             ongoing_game = channel['ongoing_game']
             res = {
                 "response_type": "in_channel",
-                "text": util.check_win()
+                "text": "Here is the current gameboard:\n For instructions type 'instructions'\n" + game.print_board()
             }
+
+    if 'move' in text:
+        players = channel['players']
+
+        if channel['game_ended'] == True and len(players) < 2:
+            res = {
+                "response_type": "ephemeral",
+                "text": "To start a new game type 'challenge @username'"
+            }
+
+        if channel['accepted_invite'] == False:
+            res = {
+                "response_type": "ephemeral",
+                "text": "Waiting for %s to accept a game. To cancel invite type 'end'" % channel['player2']
+            }
+
+        res = {
+            "response_type": "in_channel",
+            "pretext": "For instrutions type 'instructions'",
+            "text": "Here is the current gameboard:\n" + game.print_board()
+        }
 
     if 'challenge' in text:
         user_id = request.form.get('user_id')
@@ -84,7 +112,13 @@ def main():
             players |= {user_id}
             res = {
                 "response_type": "in_channel",
-                "text": "Challenge accepted",
+                "attachments": [
+                    {
+                        "text": "Please use the following cell number to make your move. \n To make a move type 'move #'\n" + game.instructions() + "\nHere is the current game board:\n" + game.print_board(),
+                        "pretext": "Challenge accepted. Please read the instructions below:",
+                        "mrkdwn_in": ["text", "pretext"]
+                    }
+                ]
             }
 
         else:
@@ -113,13 +147,14 @@ def main():
             "attachments": [
                 {
                     "text": game.instructions(),
-                    "pretext": "Please use the following cell numbers to make your move",
+                    "pretext": "Please use the following cell numbers to make your move. To make a move type 'move #'",
                     "mrkdwn_in": ["text", "pretext"]
                 }
             ]
         }
 
     return jsonify(res)
+
 
 if __name__ == '__main__':
     run_simple('0.0.0.0', 5000, app, use_reloader=True)
