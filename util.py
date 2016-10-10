@@ -1,5 +1,6 @@
 channels = {}
 
+
 def new_channel(channel_id):
     """Logging a new channel"""
 
@@ -14,14 +15,23 @@ def new_channel(channel_id):
     }
 
 
-def game_finder(channel_id):
-  """Logs all channels that have instantiated bot and opens ongoing game"""
-  if channel_id not in channels.keys():
-        new_channel(channel_id)
-  else:
-    ongoing_game = channels[channel_id]
+def create_memberlist(r):
+    existing_users = []
+    for i in r:
+        for key, value in i.iteritems():
+            if key == "name":
+                existing_users.append(str(value))
+    return existing_users
 
-  return channels[channel_id]
+
+def game_finder(channel_id):
+    """Logs all channels that have instantiated bot and opens ongoing game"""
+    if channel_id not in channels.keys():
+        new_channel(channel_id)
+    else:
+        ongoing_game = channels[channel_id]
+
+    return channels[channel_id]
 
 
 def board_positions(one=1, two=2, three=3, four=4, five=5, six=6, seven=7, eight=8, nine=9):
