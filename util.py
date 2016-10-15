@@ -12,8 +12,10 @@ def new_channel(channel_id):
         'turn': "",
         'winner': "",
         'game_ended': False,
-        'ongoing_game': [' '] * 9
+        'ongoing_game': False,
+        'board': [' '] * 9
     }
+
 
 
 def create_memberlist(r):
