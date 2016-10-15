@@ -13,7 +13,8 @@ def new_channel(channel_id):
         'winner': "",
         'game_ended': False,
         'ongoing_game': False,
-        'board': [' '] * 9
+        'board': [' '] * 9,
+        'possible_moves': [0,1,2,3,4,5,6,7,8]
     }
 
 

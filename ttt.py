@@ -37,7 +37,7 @@ def main():
                 game_board = game.print_board(channel['board'])
                 res = {
                     "response_type": "in_channel",
-                    "text": "Here is the current gameboard:\n For instructions type '/ttt instructions'\n" + str(game_board)
+                    "text": "Here is the current gameboard:\n For instructions type '/ttt instructions'\n" + game.print_board(channel['board'])
                 }
 
         if channel['ongoing_game'] is False:
@@ -52,7 +52,7 @@ def main():
         cell = int(text[5:])
         user_name = str(request.form.get('user_name'))
         turn = channel['turn']
-        possible_moves = [1,2,3,4,5,6,7,8,9]
+        possible_moves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         player2 = channel['player2']
         player1 = channel['player1']
 
@@ -60,21 +60,42 @@ def main():
             if user_id in players:
                 if turn == user_name:
                     if cell in possible_moves:
-                        channel['board'] = game.make_move(cell, turn, channel['board'])
-                        if turn == player1:
-                            channel['turn'] = player2
-                        else:
-                            channel['turn'] = player1
-                            game_board = game.print_board(channel['board'])
-                        res = {
-                            "response_type": "in_channel",
-                            "text": "You selected cell  " + str(cell) + "\nIt is now " + channel['turn'] + "'s turn.\n" + "Here is the current gameboard:\n" + game_board
-                        }
-                    if cell not in possible_moves:
-                        res = {
-                            "response_type": "ephemeral",
-                            "text": "Sorry, that is not a legitimate move."
-                        }
+                        game_moves = channel['possible_moves']
+                        if cell not in game_moves:
+                            res = {
+                                "response_type": "ephemeral",
+                                "text": "Sorry, that is not a legitimate move."
+                            }
+                        if cell in game_moves:
+                            game_board = game.make_move(
+                                cell, turn, channel['board'])
+                            channel['board'] = game_board
+                            game_moves.remove(cell)
+
+                            if len(game_moves) > 0 and game.is_winner(game_board, cell) is True:
+                                res = {
+                                    "response_type": "in_channel",
+                                    "text": turn + " has won the game!\n" + game.print_board(game_board)
+                                }
+
+                            if len(game_moves) > 0 and game.is_winner(game_board, cell) is False:
+                                if turn == player1:
+                                    channel['turn'] = player2
+                                else:
+                                    channel['turn'] = player1
+
+                                res = {
+                                    "response_type": "in_channel",
+                                    "text": "You selected cell  " + str(cell) + "\nIt is now " + channel['turn'] + "'s turn.\n" + "Here is the current gameboard:\n" + game.print_board(game_board)
+                                }
+
+                            if len(game_moves) == 0:
+                                res = {
+                                    "response_type": "in_channel",
+                                    "text": "DRAW!\n " + game.print_board(game_board)
+                                }
+                                
+
                 if turn != user_name:
                     res = {
                         "response_type": "ephemeral",
@@ -213,9 +234,9 @@ def main():
             }
         else:
             res = {
-                    "response_type": "ephemeral",
-                    "text": "There's no ongoing game.",
-                }
+                "response_type": "ephemeral",
+                "text": "There's no ongoing game.",
+            }
 
     # else:
     #     res = {
