@@ -38,21 +38,3 @@ def game_finder(channel_id):
     return channels[channel_id]
 
 
-def who_move():
-    """Returns True if it is the user's turn"""
-    pass
-
-
-def end():
-    """Ends the game without a winner"""
-    pass
-
-
-def game_history():
-    """Displays move history for a user"""
-    pass
-
-
-def user_history():
-    """Displays users win/loss ratio"""
-    pass
