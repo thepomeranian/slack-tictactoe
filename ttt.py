@@ -37,7 +37,7 @@ def main():
                 game_board = game.print_board(channel['board'])
                 res = {
                     "response_type": "in_channel",
-                    "text": "Here is the current gameboard:\n For instructions type '/ttt instructions'\n" + game.print_board(channel['board'])
+                    "text": "Here is the current gameboard:\n For instructions type '/ttt instructions'\n" + "```" + game.print_board(channel['board']) + "```"
                 }
 
         if channel['ongoing_game'] is False:
@@ -75,7 +75,7 @@ def main():
                             if len(game_moves) > 0 and game.is_winner(game_board, cell) is True:
                                 res = {
                                     "response_type": "in_channel",
-                                    "text": turn + " has won the game!\n" + game.print_board(game_board)
+                                    "text": turn + " has won the game!\n" + "```" + game.print_board(game_board) + "```"
                                 }
 
                             if len(game_moves) > 0 and game.is_winner(game_board, cell) is False:
@@ -86,13 +86,13 @@ def main():
 
                                 res = {
                                     "response_type": "in_channel",
-                                    "text": "You selected cell  " + str(cell) + "\nIt is now " + channel['turn'] + "'s turn.\n" + "Here is the current gameboard:\n" + game.print_board(game_board)
+                                    "text": "You selected cell  " + str(cell) + "\nIt is now " + channel['turn'] + "'s turn.\n" + "Here is the current gameboard:\n" + "```" + game.print_board(game_board) + "```"
                                 }
 
                             if len(game_moves) == 0:
                                 res = {
                                     "response_type": "in_channel",
-                                    "text": "DRAW!\n " + game.print_board(game_board)
+                                    "text": "DRAW!\n " + "```" + game.print_board(game_board) + "```"
                                 }
                                 
 
@@ -185,7 +185,7 @@ def main():
                     "response_type": "in_channel",
                     "attachments": [
                         {
-                            "text": "Please use the following cell number to make your move.\n/ttt move # - to make a move\n/ttt end - to end the game\n" + game.instructions() + "\nHere is the current game board:\n" + game.print_board(channel['board']),
+                            "text": "Please use the following cell number to make your move.\n/ttt move # - to make a move\n/ttt end - to end the game\n" +  "```" + game.instructions() + "```" + "\nHere is the current game board:\n" +  "```" + game.print_board(channel['board']) +  "```",
                             "pretext": "Challenge accepted. Please read the instructions below:",
                             "mrkdwn_in": ["text", "pretext"]
                         }
@@ -217,7 +217,7 @@ def main():
 
             "attachments": [
                 {
-                    "text": game.instructions(),
+                    "text":  "```" + game.instructions() +  "```",
                     "pretext": "Please use the following cell numbers to make your move.\n/ttt move # - to make a move\n/ttt end - to end the game",
                     "mrkdwn_in": ["text", "pretext"]
                 }
