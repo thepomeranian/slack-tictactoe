@@ -31,26 +31,8 @@ def main():
         players = channel['players']
         res = game_status(players, channel)
 
-    if 'move' in text:
-        players = channel['players']
-        user_id = request.form.get('user_id')
-
-        if len(text) < 5:
-            res = {
-                "response_type": "ephemeral",
-                "text": "Sorry, please enter a legitimate move."
-            }
-        else:
-            cell = int(text[5:])
-        user_name = str(request.form.get('user_name'))
-        turn = channel['turn']
-        possible_moves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        player2 = channel['player2']
-        player1 = channel['player1']
-        res = move(user_id, players, user_name, turn,
-                   possible_moves, player1, player2, channel, cell)
-
     if 'challenge' in text:
+        # have it repopulate existing users
         user_id = request.form.get('user_id')
         user_name = str(request.form.get('user_name'))
         player2 = str(text[11:])
@@ -69,6 +51,26 @@ def main():
 
     if text == 'end':
         res = end(channel)
+
+    if 'move' in text:
+        players = channel['players']
+        user_id = request.form.get('user_id')
+
+        if len(text) < 5:
+            res = {
+                "response_type": "ephemeral",
+                "text": "Sorry, please enter a legitimate move."
+            }
+        else:
+            cell = int(text[5:])
+            
+        user_name = str(request.form.get('user_name'))
+        turn = channel['turn']
+        possible_moves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        player2 = channel['player2']
+        player1 = channel['player1']
+        res = move(user_id, players, user_name, turn,
+                   possible_moves, player1, player2, channel, cell)
 
     return jsonify(res)
 
@@ -97,6 +99,7 @@ def game_status(players, channel):
 
 # need to clear the board after a result has been declared. 
 # let the game_board print, set game.board to blanks and set channel['board'] to game.board?
+# need to fix possible game moves counter
 def move(user_id, players, user_name, turn, possible_moves, player1, player2, channel, cell):
     if channel['accepted_invite'] is True:
         if user_id in players:
@@ -115,6 +118,9 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                         game_moves.remove(cell)
 
                         if len(game_moves) > 0 and game.is_winner(game_board, cell) is True:
+                            channel['board'] = [' '] * 9
+                            channel['ongoing_game'] = False
+                            channel['accepted_invite'] = False
                             res = {
                                 "response_type": "in_channel",
                                 "text": turn + " has won the game!\n" + "```" + game.print_board(game_board) + "```"
@@ -132,6 +138,9 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                             }
 
                         if len(game_moves) == 0:
+                            channel['board'] = [' '] * 9
+                            channel['ongoing_game'] = False
+                            channel['accepted_invite'] = False
                             res = {
                                 "response_type": "in_channel",
                                 "text": "DRAW!\n " + "```" + game.print_board(game_board) + "```"
@@ -156,11 +165,11 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
             "text": "To start a game type '/ttt challenge @username'"
         }
 
-    if channel['game_ended'] is True:
-        res = {
-            "response_type": "ephemeral",
-            "text": "To start a new game type '/ttt challenge @username'"
-        }
+    # if channel['game_ended'] is True:
+    #     res = {
+    #         "response_type": "ephemeral",
+    #         "text": "To start a new game type '/ttt challenge @username'"
+    #     }
 
     if channel['accepted_invite'] is False and channel['ongoing_game'] is True:
         res = {
