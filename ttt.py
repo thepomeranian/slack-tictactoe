@@ -52,44 +52,37 @@ def main():
     if text == 'end':
         res = end(channel)
 
-    if text == 'moves':
-        res = moves(channel)
-
     if 'move' in text:
         players = channel['players']
         user_id = request.form.get('user_id')
+        if channel['ongoing_game'] is True:
+            if channel['accepted_invite'] is True:
+                if len(text) < 5:
+                    res = {
+                        "response_type": "ephemeral",
+                        "text": "Sorry, please enter a legitimate move."
+                    }
+                else:
+                    cell = int(text[5:])
+                user_name = str(request.form.get('user_name'))
+                turn = channel['turn']
+                possible_moves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+                player2 = channel['player2']
+                player1 = channel['player1']
+                res = move(user_id, players, user_name, turn,
+                           possible_moves, player1, player2, channel, cell)
 
-        if len(text) < 5:
+        else:
             res = {
                 "response_type": "ephemeral",
                 "text": "Sorry, please enter a legitimate move."
             }
-        else:
-            cell = int(text[5:])
-
-        user_name = str(request.form.get('user_name'))
-        turn = channel['turn']
-        possible_moves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        player2 = channel['player2']
-        player1 = channel['player1']
-        res = move(user_id, players, user_name, turn,
-                   possible_moves, player1, player2, channel, cell)
 
     return jsonify(res)
 
 
-def moves(channel):
-    moves = channel['possible_moves']
-    if channel['ongoing_game'] is True:
-        if channel['accepted_invite'] is True:
-            res = {
-                        "response_type": "in_channel",
-                        "text": "Here are the possible moves left for this game:\n" + moves
-                    }
-        
-    return res
-
 def game_status(players, channel):
+    """Returns the current game status, game board, and whose turn it is if there is an ongoing game."""
     if channel['ongoing_game'] is True:
         if not channel['accepted_invite']:
             res = {
@@ -114,6 +107,7 @@ def game_status(players, channel):
 
 
 def move(user_id, players, user_name, turn, possible_moves, player1, player2, channel, cell):
+    """Returns a draw, winner, or prints the new board after a player makes a move"""
     if channel['accepted_invite'] is False:
         res = {
             "response_type": "ephemeral",
@@ -139,7 +133,8 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                             channel['board'] = [' '] * 9
                             channel['ongoing_game'] = False
                             channel['accepted_invite'] = False
-                            channel['possible_moves'] = [1,2,3,4,5,6,7,8,9]
+                            channel['possible_moves'] = [
+                                0, 1, 2, 3, 4, 5, 6, 7, 8]
                             res = {
                                 "response_type": "in_channel",
                                 "text": turn + " has won the game!\n" + "```" + game.print_board(game_board) + "```"
@@ -160,7 +155,8 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                             channel['board'] = [' '] * 9
                             channel['ongoing_game'] = False
                             channel['accepted_invite'] = False
-                            channel['possible_moves'] = [1,2,3,4,5,6,7,8,9]
+                            channel['possible_moves'] = [
+                                0, 1, 2, 3, 4, 5, 6, 7, 8]
                             res = {
                                 "response_type": "in_channel",
                                 "text": "DRAW!\n " + "```" + game.print_board(game_board) + "```"
@@ -195,6 +191,7 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
 
 
 def challenge(user_id, user_name, player2, channel):
+    """Challenges another player in the same channel to a game of tictactoe"""
     if channel['ongoing_game'] is True:
         res = {
             "response_type": "ephemeral",
@@ -319,6 +316,8 @@ def end(channel):
     if channel['accepted_invite'] is True and channel['ongoing_game'] is True:
         player2 = channel['player2']
         player1 = channel['player1']
+        channel['board'] = [' '] * 9
+        channel['possible_moves'] = [0, 1, 2, 3, 4, 5, 6, 7, 8]
         channel['ongoing_game'] = False
         res = {
             "response_type": "in_channel",
@@ -326,6 +325,10 @@ def end(channel):
         }
 
     return res
+
+
+def clear_game(channel):
+    pass
 
 if __name__ == '__main__':
     run_simple('0.0.0.0', 5000, app, use_reloader=True)
