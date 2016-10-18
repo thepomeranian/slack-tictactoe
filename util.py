@@ -20,6 +20,7 @@ def new_channel(channel_id):
 
 
 def create_memberlist(r):
+    """Generate a list of members in the channel"""
     existing_users = []
     for i in r:
         for key, value in i.iteritems():

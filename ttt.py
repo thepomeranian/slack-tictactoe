@@ -17,6 +17,7 @@ r = response.body['members']
 
 @app.route('/', methods=['POST'])
 def main():
+    """Main function for the slash command that catches all of the possible commands and processes them"""
     text = request.form.get('text')
     channel_id = str(request.form.get('channel_id'))
 
@@ -228,6 +229,7 @@ def challenge(user_id, user_name, player2, channel):
 
 
 def accept(user_id, user_name, channel):
+    """Allows the challenged player to accept a challenge"""
     players = channel['players']
     player2 = channel['player2']
     player1 = channel['player1']
@@ -266,6 +268,7 @@ def accept(user_id, user_name, channel):
 
 
 def help():
+    """Returns all of the possible moves for the slash command"""
     res = {
         "response_type": "ephemeral",
 
@@ -282,6 +285,7 @@ def help():
 
 
 def instructions():
+    """Returns the instructions for the game"""
     res = {
         "response_type": "ephemeral",
 
@@ -298,6 +302,7 @@ def instructions():
 
 
 def end(channel):
+    """Ends the game regardless of it's current state."""
     if channel['ongoing_game'] is False and channel['accepted_invite'] is False:
         res = {
             "response_type": "ephemeral",
@@ -328,6 +333,7 @@ def end(channel):
 
 
 def clear_game(channel):
+    """Need to implement a clear game function rather than hardcoding the reset when a game is ended or has ended."""
     pass
 
 if __name__ == '__main__':
