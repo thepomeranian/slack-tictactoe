@@ -52,6 +52,9 @@ def main():
     if text == 'end':
         res = end(channel)
 
+    if text == 'moves':
+        res = moves(channel)
+
     if 'move' in text:
         players = channel['players']
         user_id = request.form.get('user_id')
@@ -63,7 +66,7 @@ def main():
             }
         else:
             cell = int(text[5:])
-            
+
         user_name = str(request.form.get('user_name'))
         turn = channel['turn']
         possible_moves = [0, 1, 2, 3, 4, 5, 6, 7, 8]
@@ -74,6 +77,17 @@ def main():
 
     return jsonify(res)
 
+
+def moves(channel):
+    moves = channel['possible_moves']
+    if channel['ongoing_game'] is True:
+        if channel['accepted_invite'] is True:
+            res = {
+                        "response_type": "in_channel",
+                        "text": "Here are the possible moves left for this game:\n" + moves
+                    }
+        
+    return res
 
 def game_status(players, channel):
     if channel['ongoing_game'] is True:
@@ -96,11 +110,15 @@ def game_status(players, channel):
             "response_type": "ephemeral",
             "text": "To start a game type '/ttt challenge @username'"
         }
+    return res
 
-# need to clear the board after a result has been declared. 
-# let the game_board print, set game.board to blanks and set channel['board'] to game.board?
-# need to fix possible game moves counter
+
 def move(user_id, players, user_name, turn, possible_moves, player1, player2, channel, cell):
+    if channel['accepted_invite'] is False:
+        res = {
+            "response_type": "ephemeral",
+            "text": "To start a game type '/ttt challenge @username'"
+        }
     if channel['accepted_invite'] is True:
         if user_id in players:
             if turn == user_name:
@@ -121,6 +139,7 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                             channel['board'] = [' '] * 9
                             channel['ongoing_game'] = False
                             channel['accepted_invite'] = False
+                            channel['possible_moves'] = [1,2,3,4,5,6,7,8,9]
                             res = {
                                 "response_type": "in_channel",
                                 "text": turn + " has won the game!\n" + "```" + game.print_board(game_board) + "```"
@@ -141,6 +160,7 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                             channel['board'] = [' '] * 9
                             channel['ongoing_game'] = False
                             channel['accepted_invite'] = False
+                            channel['possible_moves'] = [1,2,3,4,5,6,7,8,9]
                             res = {
                                 "response_type": "in_channel",
                                 "text": "DRAW!\n " + "```" + game.print_board(game_board) + "```"
@@ -158,12 +178,6 @@ def move(user_id, players, user_name, turn, possible_moves, player1, player2, ch
                 "response_type": "in_channel",
                 "text": "Sorry, this is a game between %s and %s. To end their game type '/ttt end'" % (player1, player2)
             }
-
-    if channel['accepted_invite'] is False:
-        res = {
-            "response_type": "ephemeral",
-            "text": "To start a game type '/ttt challenge @username'"
-        }
 
     # if channel['game_ended'] is True:
     #     res = {
@@ -239,7 +253,7 @@ def accept(user_id, user_name, channel):
                 "attachments": [
                     {
                         "text": "Please use the following cell number to make your move.\n/ttt move # - to make a move\n/ttt end - to end the game\n" + "```" + game.instructions() + "```" + "\nHere is the current game board:\n" + "```" + game.print_board(channel['board']) + "```",
-                        "pretext": "Challenge accepted. Please read the instructions below:",
+                        "pretext": "Challenge accepted. %s starts the game. Your marker is 'O'. Please read the instructions below:" % player2,
                         "mrkdwn_in": ["text", "pretext"]
                     }
                 ]
