@@ -1,7 +1,7 @@
 #Slack TicTacToe
----
+
 ###A slack command that allows two users in the same team to engage in a game of tictactoe.
----
+
 ###Commands
 - ***'/ttt game'*** - Returns the current game status, game board, and whose turn it is if there is an ongoing game.
 - ***'/ttt move #'*** - Returns a draw, winner, or prints the new board after a player makes a move
@@ -10,7 +10,7 @@
 - ***'/ttt help'*** - Returns all of the possible moves for the slash command
 - ***'/ttt instructions'*** - Returns the instructions for the game
 - ***'/ttt challenge @username'*** - Challenges another player in the same channel to a game of tictactoe
----
+
 ###Tech Stack
 This information can be found in `Requirements.txt`
 ```
@@ -24,7 +24,13 @@ slacker==0.9.25
 tabulate==0.7.5
 Werkzeug==0.11.11
 ```
----
+
+###Screenshots
+![](http://i.imgur.com/5liv5Cs.gif)
+
+###Wakatime Log
+https://wakatime.com/@kawaiiru/projects/pgnacjtppp?start=2016-10-05&end=2016-10-18
+
 ###Psuedocode
 ```
 commands = ['game', 'challenge', 'end', 'accept', 'help', 'instructions', 'move']

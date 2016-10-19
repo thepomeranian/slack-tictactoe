@@ -14,11 +14,11 @@ class Game:
 
     def instructions(self):
         """Returns the gameboard with all of the corresponding cell numbers"""
-      return self.game_board % (0,1,2,3,4,5,6,7,8)
+        return self.game_board % (0,1,2,3,4,5,6,7,8)
 
     def print_board(self, board):
         """Returns the current board"""
-      return self.game_board % tuple(board[0:3] + board[3:6] + board[6:9])
+        return self.game_board % tuple(board[0:3] + board[3:6] + board[6:9])
 
     def initialize(self, player1, player2):
         """Sets the player1 and player2"""
